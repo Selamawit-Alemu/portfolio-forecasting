@@ -1,0 +1,9 @@
+Normalized Price Trends (2015–2024)
+
+- **TSLA (Blue Line)**: This asset showed the most dramatic and volatile performance. For several years (2015–2019), it remained at a low, stable normalized price. A massive surge began in late 2019, peaking in late 2021. After this peak, it experienced a significant correction but has since recovered and is trading at a high level. TSLA's normalized price shows its extreme growth and subsequent volatility compared to the other two assets.
+
+- **BND (Orange Line)**: This represents a bond fund, which is typically considered a more conservative and less volatile investment. From 2015 to 2020, BND showed steady, albeit slow, growth. However, after 2020, it experienced a significant and consistent decline in value, reaching its low point around 2024. This reflects a period of rising interest rates, which typically cause bond prices to fall.
+
+- **SPY (Green Line)**: This represents the S&P 500, a broad market index and a common benchmark for the overall stock market. SPY showed a consistent and steady upward trend throughout the entire period from 2015 to 2024, with only a few minor dips, such as the one in early 2020. This indicates a strong and sustained bull market for the S&P 500 over this decade.
+
+**Summary**: The normalized chart effectively visualizes the different risk and return profiles of these three assets. TSLA represents a high-risk, high-reward growth stock. SPY represents the steady, long-term growth of the overall market. BND represents a more conservative asset whose performance was significantly impacted by macroeconomic factors like interest rates, particularly in recent years.
