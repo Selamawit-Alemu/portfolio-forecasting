@@ -1,0 +1,38 @@
+name: CI - Python Project
+
+on:
+  push:
+    branches: [ "**" ]  # Run on all branches
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: 🐍 Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install flake8
+
+    - name: ✅ Run flake8 (skip missing folders)
+      run: |
+        for dir in src notebooks tests; do
+          if [ -d "$dir" ]; then
+            echo "Linting $dir ..."
+            flake8 "$dir" --count --select=E9,F63,F7,F82 --show-source --statistics
+            flake8 "$dir" --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+          else
+            echo "Directory $dir not found. Skipping..."
+          fi
+        done
