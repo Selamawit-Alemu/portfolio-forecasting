@@ -39,7 +39,8 @@ The repository is structured to ensure **professional organization** and **full 
     ├── notebooks/
     │   └── 01_eda.ipynb                 # Exploratory data analysis
     ├── reports/
-    │   └── normalized_price_analysis.txt # Text-based summary of findings
+    │   ├──EDA_RESULTS_AND_ANALYSIS.MD    #Text-based summary of findings
+    │   └── normalized_price_analysis.txt # Text-based summary of normalized price analysis
     ├── src/
     │   ├── data_cleaning.py             # Data cleaning pipeline
     │   └── data_loader.py               # Data loading utilities
