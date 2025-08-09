@@ -99,7 +99,54 @@ pip install -r requirements.txt
    * Perform statistical tests (ADF)
 
 ---
+Here's a simple Dockerfile tailored for your Python financial analysis project with the structure you shared:
 
+```Dockerfile
+# Use official lightweight Python image
+FROM python:3.11-slim
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy requirements.txt first to leverage Docker cache
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the entire project
+COPY . .
+
+# Expose Jupyter Notebook default port
+EXPOSE 8888
+
+# Default command to run Jupyter Notebook (adjust if you want to run scripts instead)
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+```
+
+---
+
+### How to use:
+
+1. **Build the Docker image** (run this in your project root, where the Dockerfile is):
+
+```bash
+docker build -t portfolio-forecasting .
+```
+
+2. **Run the container** and map port 8888 so you can access Jupyter Notebook from your browser:
+
+```bash
+docker run -p 8888:8888 portfolio-forecasting
+```
+
+3. Open your browser to `http://localhost:8888` to start working inside the container.
+
+
+
+
+
+-------------------------------
 ## **Running the Analysis**
 
 ### Using Notebooks
@@ -111,7 +158,7 @@ jupyter notebook notebooks/01_eda.ipynb
 ### Using Scripts
 
 ```bash
-python src/data_loader.py
+python src/data_loader.py # to load BND, SPY and TSLA data
 python src/data_cleaning.py
 ```
 
