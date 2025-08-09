@@ -39,6 +39,7 @@ The repository is structured to ensure **professional organization** and **full 
     ├── notebooks/
     │   └── 01_eda.ipynb                 # Exploratory data analysis
     ├── reports/
+    │   ├──figures/                       #figures of plots
     │   ├──EDA_RESULTS_AND_ANALYSIS.MD    #Text-based summary of findings
     │   └── normalized_price_analysis.txt # Text-based summary of normalized price analysis
     ├── src/
@@ -82,6 +83,11 @@ pip install -r requirements.txt
 ## **Data Workflow**
 
 1. **Raw Data**
+   Run the scripts in `src/data_loader.py` to:
+
+    * Fetches historical financial data for a predefined list of tickers (e.g., TSLA, BND, SPY) using the yfinance library.
+    * Saves the retrieved data for each ticker into a separate CSV file.
+    * Manages file directories by automatically creating the data/raw/ folder if it doesn't exist.
    Stored in `data/raw/`, containing unmodified historical prices.
 
 2. **Cleaning & Preprocessing**
@@ -98,35 +104,8 @@ pip install -r requirements.txt
    * Analyze volatility and trends
    * Perform statistical tests (ADF)
 
----
-Here's a simple Dockerfile tailored for your Python financial analysis project with the structure you shared:
 
-```Dockerfile
-# Use official lightweight Python image
-FROM python:3.11-slim
-
-# Set working directory inside the container
-WORKDIR /app
-
-# Copy requirements.txt first to leverage Docker cache
-COPY requirements.txt .
-
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the entire project
-COPY . .
-
-# Expose Jupyter Notebook default port
-EXPOSE 8888
-
-# Default command to run Jupyter Notebook (adjust if you want to run scripts instead)
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
-```
-
----
-
-### How to use:
+### How to use in Docker:
 
 1. **Build the Docker image** (run this in your project root, where the Dockerfile is):
 
@@ -142,11 +121,6 @@ docker run -p 8888:8888 portfolio-forecasting
 
 3. Open your browser to `http://localhost:8888` to start working inside the container.
 
-
-
-
-
--------------------------------
 ## **Running the Analysis**
 
 ### Using Notebooks
@@ -171,11 +145,8 @@ python src/data_cleaning.py
 * Cleaned datasets are versioned in `data/processed/` for reproducibility.
 * Raw data is preserved in `data/raw/` to ensure original sources remain unchanged.
 
----
 
 ## **Results & Insights**
-
-Example findings:
 
 * **BND**: Very low volatility; stable performance.
 * **SPY**: Moderate volatility with consistent growth.
