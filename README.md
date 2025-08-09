@@ -76,8 +76,6 @@ source .venv/bin/activate   # On Mac/Linux
 pip install -r requirements.txt
 ```
 
-*(Alternatively, you can provide a `conda` environment file or Dockerfile if preferred.)*
-
 ---
 
 ## **Data Workflow**
