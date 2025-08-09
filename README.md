@@ -49,7 +49,7 @@ The repository is structured to ensure **professional organization** and **full 
     ├── requirements.txt                 # Python dependencies
     ├── README.md                        # Project documentation
     └── .venv/                           # Virtual environment (local use only)
-    ```
+```
 
 ---
 
@@ -58,8 +58,8 @@ The repository is structured to ensure **professional organization** and **full 
 ### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/financial-analysis.git
-cd financial-analysis
+git clone https://github.com/Selamawit-Alemu/portfolio-forecasting.git
+cd portfolio-forecasting
 ```
 
 ### 2️⃣ Create and activate a virtual environment
