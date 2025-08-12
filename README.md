@@ -1,76 +1,83 @@
 # portfolio-forecasting
 
-# **Financial Time Series Analysis – TSLA, BND, SPY**
+## Financial Time Series Analysis & Portfolio Optimization – TSLA, BND, SPY
 
-## **Overview**
+## Overview
 
-This project analyzes the historical performance, volatility, and risk metrics of three financial assets:
+This project performs a comprehensive financial time series analysis, forecasting, and portfolio optimization for three assets:
 
-* **TSLA** – High-return, high-volatility growth stock
-* **BND** – Low-risk, stable bond fund
+* **TSLA** – High-growth, high-volatility stock
+* **BND** – Low-risk, stable bond ETF
 * **SPY** – Moderate-risk, diversified S\&P 500 ETF
 
 The analysis includes:
 
 * Data loading, cleaning, and preprocessing
-* Exploratory Data Analysis (EDA)
-* Seasonality and trend testing (ADF test)
-* Volatility measurement
-* Risk metrics (Value at Risk, Sharpe Ratio)
-* Visualizations and key insights
+* Exploratory Data Analysis (EDA) including volatility and risk metrics
+* Time series forecasting using ARIMA and LSTM models
+* Portfolio optimization based on Modern Portfolio Theory (MPT)
+* Strategy backtesting against benchmark portfolios
+* Visualization and detailed reporting
 
-The repository is structured to ensure **professional organization** and **full reproducibility**.
+This repository is organized for **full reproducibility** and **scalable experimentation**.
 
 ---
 
-## **Repository Structure**
+## Repository Structure
 
 ```plaintext
-    ├── .github/workflows/ci.yml        # GitHub Actions CI workflow
-    ├── data/
-    │   ├── processed/                  # Cleaned datasets for analysis
-    │   │   ├── bnd_clean.csv
-    │   │   ├── spy_clean.csv
-    │   │   └── tsla_clean.csv
-    │   └── raw/                        # Original downloaded datasets
-    │       ├── BND.csv
-    │       ├── SPY.csv
-    │       └── TSLA.csv
-    ├── notebooks/
-    │   └── 01_eda.ipynb                 # Exploratory data analysis
-    ├── reports/
-    │   ├──figures/                       #figures of plots
-    │   ├──EDA_RESULTS_AND_ANALYSIS.MD    #Text-based summary of findings
-    │   └── normalized_price_analysis.txt # Text-based summary of normalized price analysis
-    ├── src/
-    │   ├── data_cleaning.py             # Data cleaning pipeline
-    │   └── data_loader.py               # Data loading utilities
-    ├── .gitignore
-    ├── requirements.txt                 # Python dependencies
-    ├── README.md                        # Project documentation
-    └── .venv/                           # Virtual environment (local use only)
+.github/
+└── workflows/                # CI workflow files
+data/
+├── processed/                # Cleaned datasets
+└── raw/                      # Raw downloaded datasets
+models/
+├── arima_model.pkl           # Serialized ARIMA model
+├── lstm_model.h5             # LSTM model weights
+└── lstm_model.pkl            # Serialized LSTM model
+notebooks/
+├── 01_eda.ipynb              # Exploratory Data Analysis
+├── 02_forecasting_models.ipynb  # Forecasting using ARIMA & LSTM
+└── 03_Portfolio_Optimization_and_Backtesting.ipynb  # Portfolio tasks
+reports/
+├── figures/                  # Generated figures and plots
+├── EDA_RESULTS_AND_ANALYSIS.md  # Summary of EDA findings
+└── normalized_price_analysis.txt  # Price normalization analysis
+src/
+├── arima_model.py            # ARIMA forecasting logic
+├── data_cleaning.py          # Data cleaning pipeline
+├── data_loader.py            # Data fetching utilities
+├── data_prep.py              # Data preprocessing helpers
+├── lstm_model.py             # LSTM forecasting model implementation
+└── portfolio_optimization.py # Portfolio optimization and backtesting logic
+.venv/                        # Local Python virtual environment
+.gitignore
+docker-compose.yml
+Dockerfile
+README.md
+requirements.txt
 ```
 
 ---
 
-## **Setup Instructions**
+## Setup Instructions
 
-### 1️⃣ Clone the repository
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/Selamawit-Alemu/portfolio-forecasting.git
 cd portfolio-forecasting
 ```
 
-### 2️⃣ Create and activate a virtual environment
+2. Create and activate the virtual environment:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # On Mac/Linux
-.venv\Scripts\activate      # On Windows
+source .venv/bin/activate   # macOS/Linux
+.venv\Scripts\activate      # Windows
 ```
 
-### 3️⃣ Install dependencies
+3. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -78,81 +85,47 @@ pip install -r requirements.txt
 
 ---
 
-## **Data Workflow**
+## Data Workflow
 
-1. **Raw Data**
-   Run the scripts in `src/data_loader.py` to:
+* **Raw Data:** Use `src/data_loader.py` to fetch historical daily prices for TSLA, BND, and SPY, saved under `data/raw/`.
+* **Data Cleaning:** Run `src/data_cleaning.py` to clean, fill missing values, and save processed data under `data/processed/`.
+* **Data Preparation:** Use `src/data_prep.py` for feature engineering and preprocessing required for modeling.
 
-    * Fetches historical financial data for a predefined list of tickers (e.g., TSLA, BND, SPY) using the yfinance library.
-    * Saves the retrieved data for each ticker into a separate CSV file.
-    * Manages file directories by automatically creating the data/raw/ folder if it doesn't exist.
-   Stored in `data/raw/`, containing unmodified historical prices.
+---
 
-2. **Cleaning & Preprocessing**
-   Run the cleaning scripts in `src/data_cleaning.py` to:
+## Modeling & Analysis
 
-   * Handle missing values
-   * Ensure correct data types
-   * Save cleaned data to `data/processed/`
+* **Exploratory Data Analysis (EDA):** Conducted in `notebooks/01_eda.ipynb` with visualizations and volatility metrics.
+* **Forecasting Models:** Implemented ARIMA and LSTM forecasting in `notebooks/02_forecasting_models.ipynb`.
+* **Portfolio Optimization and Backtesting:** Performed using Modern Portfolio Theory in `notebooks/03_Portfolio_Optimization_and_Backtesting.ipynb` combining forecasted returns with historical data.
 
-3. **Exploratory Analysis**
-   Open `notebooks/01_eda.ipynb` to:
+---
 
-   * Plot price trends and returns
-   * Analyze volatility and trends
-   * Perform statistical tests (ADF)
+## Running the Notebooks
 
-
-### How to use in Docker:
-
-1. **Build the Docker image** (run this in your project root, where the Dockerfile is):
-
-```bash
-docker build -t portfolio-forecasting .
-```
-
-2. **Run the container** and map port 8888 so you can access Jupyter Notebook from your browser:
-
-```bash
-docker run -p 8888:8888 portfolio-forecasting
-```
-
-3. Open your browser to `http://localhost:8888` to start working inside the container.
-
-## **Running the Analysis**
-
-### Using Notebooks
+To explore and reproduce the analysis, launch the notebooks:
 
 ```bash
 jupyter notebook notebooks/01_eda.ipynb
-```
-
-### Using Scripts
-
-```bash
-python src/data_loader.py # to load BND, SPY and TSLA data
-python src/data_cleaning.py
+jupyter notebook notebooks/02_forecasting_models.ipynb
+jupyter notebook notebooks/03_Portfolio_Optimization_and_Backtesting.ipynb
 ```
 
 ---
 
-## **Version Control & Reproducibility**
+## Results Summary
 
-* All code changes are tracked via Git commits.
-* GitHub Actions CI (`.github/workflows/ci.yml`) ensures scripts execute without errors.
-* Cleaned datasets are versioned in `data/processed/` for reproducibility.
-* Raw data is preserved in `data/raw/` to ensure original sources remain unchanged.
+* **Forecasting:** LSTM and ARIMA models produced varying accuracy; the best forecast was used for portfolio optimization.
+* **Portfolio Optimization:** Combined forecasted and historical returns to generate Efficient Frontier, identifying max Sharpe and minimum volatility portfolios.
+* **Backtesting:** Strategy backtest showed initial promise over benchmark portfolio, with caveats on data limitations and model assumptions.
 
+---
 
-## **Results & Insights**
+## Version Control & Reproducibility
 
-* **BND**: Very low volatility; stable performance.
-* **SPY**: Moderate volatility with consistent growth.
-* **TSLA**: Extremely high volatility; high growth potential but large drawdowns.
-* Risk metrics calculated:
+* All code and analysis tracked with Git commits.
+* Continuous Integration via GitHub Actions (`.github/workflows/ci.yml`) runs tests on core scripts.
+* Raw and processed data are versioned separately to maintain data provenance.
 
-  * **Value at Risk (95%)** for downside risk
-  * **Sharpe Ratio (annualized)** for risk-adjusted returns
-
-Full details in `reports/`.
+---
 
