@@ -1,41 +1,70 @@
+# src/data_loader.py
+
 import yfinance as yf
 import pandas as pd
-import os
-import logging
+from typing import List, Optional
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+def fetch_historical_data(
+    tickers: List[str],
+    start_date: str,
+    end_date: str
+) -> Optional[pd.DataFrame]:
+    """
+    Fetches and combines historical financial data for multiple tickers.
 
-# Constants
-TICKERS = ['TSLA', 'BND', 'SPY']
-START_DATE = '2015-07-01'
-END_DATE = '2025-07-31'
-SAVE_DIR = 'data/raw/'
+    This function downloads historical 'Adj Close' prices for a list of tickers,
+    merges them into a single DataFrame, and handles potential errors gracefully.
 
-def fetch_and_save_data(ticker: str, start: str, end: str, save_dir: str):
-    """Fetches and saves historical data for a given ticker."""
+    Args:
+        tickers (List[str]): A list of ticker symbols (e.g., ['TSLA', 'BND', 'SPY']).
+        start_date (str): The start date for the data in 'YYYY-MM-DD' format.
+        end_date (str): The end date for the data in 'YYYY-MM-DD' format.
+
+    Returns:
+        Optional[pd.DataFrame]: A DataFrame with the 'Adj Close' prices for each ticker,
+                                or None if the data fetching fails.
+    """
     try:
-        logging.info(f"Fetching data for {ticker}...")
-        df = yf.download(ticker, start=start, end=end)
+        # Use yf.download to get data for all tickers at once
+        data = yf.download(
+            tickers,
+            start=start_date,
+            end=end_date,
+            group_by='ticker'
+        )
         
-        if df.empty:
-            logging.warning(f"No data found for {ticker}.")
-            return
+        # Check if any data was returned
+        if data.empty:
+            print("Warning: No data found for the specified tickers or dates.")
+            return None
 
-        os.makedirs(save_dir, exist_ok=True)
-        save_path = os.path.join(save_dir, f"{ticker}.csv")
-        df.reset_index().to_csv(save_path, index=False)
-        logging.info(f"Saved {ticker} data to {save_path}")
+        # Extract only the 'Adj Close' prices for each ticker
+        adj_close_df = pd.DataFrame()
+        for ticker in tickers:
+            if ticker in data.columns.get_level_values(0):
+                adj_close_df[ticker] = data[ticker]['Adj Close']
+            else:
+                print(f"Warning: No 'Adj Close' data found for {ticker}. Skipping.")
+
+        # Ensure the index is a DatetimeIndex
+        adj_close_df.index = pd.to_datetime(adj_close_df.index)
+
+        return adj_close_df.sort_index()
+
     except Exception as e:
-        logging.error(f"Error fetching data for {ticker}: {e}")
-
-def fetch_all_data():
-    """Fetches data for all target tickers and saves them."""
-    for ticker in TICKERS:
-        fetch_and_save_data(ticker, START_DATE, END_DATE, SAVE_DIR)
+        print(f"Error fetching data: {e}")
+        return None
 
 if __name__ == "__main__":
-    fetch_all_data()
+    # Example usage:
+    TICKERS = ['TSLA', 'BND', 'SPY']
+    START_DATE = '2015-07-01'
+    END_DATE = '2025-07-31'
+
+    price_data = fetch_historical_data(TICKERS, START_DATE, END_DATE)
+
+    if price_data is not None:
+        print("Data fetched successfully:")
+        print(price_data.head())
+    else:
+        print("Data fetching failed.")
