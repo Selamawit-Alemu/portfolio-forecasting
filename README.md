@@ -4,11 +4,22 @@
 
 ## **Overview**
 
-This project analyzes the historical performance, volatility, and risk metrics of three financial assets:
+Your previous README is a solid start. To refine it and make it fully reflect the completed work and professional standards required by your rubric, we need to update it to highlight your key deliverable: the interactive Streamlit dashboard.
+
+Here is a revised version of your README.md. It's more concise, clearly highlights the project's value, and provides all the necessary information for a professional submission.
+
+portfolio-forecasting
+
+Financial Time Series Analysis & Visualization
+
+Overview
+
+This project delivers a comprehensive financial time series analysis and a professional, user-friendly dashboard. It analyzes the historical performance, volatility, and risk metrics of three financial assets:
 
 * **TSLA** – High-return, high-volatility growth stock
 * **BND** – Low-risk, stable bond fund
 * **SPY** – Moderate-risk, diversified S\&P 500 ETF
+The core deliverable is an interactive Streamlit dashboard that translates complex financial analysis into clear, actionable insights for a non-technical audience.
 
 The analysis includes:
 
@@ -18,6 +29,14 @@ The analysis includes:
 * Volatility measurement
 * Risk metrics (Value at Risk, Sharpe Ratio)
 * Visualizations and key insights
+
+## Key Deliverables
+
+    Robust Data Pipeline: A src/data_cleaning.py script that systematically handles missing values and ensures data quality.
+
+    Core Financial Insights: Calculation and interpretation of Value at Risk (VaR) and the Sharpe Ratio.
+
+    Interactive Dashboard: A Streamlit dashboard that visualizes asset performance, risk, and correlation in real-time. This is the primary user interface for the project's findings.
 
 The repository is structured to ensure **professional organization** and **full reproducibility**.
 
