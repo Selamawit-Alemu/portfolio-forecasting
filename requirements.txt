@@ -10,3 +10,6 @@ tensorflow
 keras 
 PyPortfolioOpt
 jupyter
+pmdarima
+plotly
+streamlit 
