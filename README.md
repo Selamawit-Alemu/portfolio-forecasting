@@ -47,6 +47,7 @@ The repository is structured to ensure **professional organization** and **full 
     │   └── data_loader.py               # Data loading utilities
     ├── .gitignore
     ├── requirements.txt                 # Python dependencies
+    ├── app.py                           # dashboard for non- technical users
     ├── README.md                        # Project documentation
     └── .venv/                           # Virtual environment (local use only)
 ```
@@ -75,7 +76,11 @@ source .venv/bin/activate   # On Mac/Linux
 ```bash
 pip install -r requirements.txt
 ```
+### 4 For Dashboard Access
 
+```bash
+streamlit run app.py 
+```
 ---
 
 ## **Data Workflow**
