@@ -5,6 +5,21 @@ import matplotlib.pyplot as plt
 from pypfopt import EfficientFrontier, risk_models, expected_returns
 
 def load_data():
+    """
+    Load and preprocess historical price data for BND and SPY.
+
+    Steps:
+        - Reads CSV files for BND and SPY from the raw data folder.
+        - Parses the 'Date' column as datetime.
+        - Drops rows with missing dates.
+        - Sets 'Date' as the DataFrame index.
+        - Converts 'Close' column to numeric values and drops invalid entries.
+
+    Returns:
+        tuple: 
+            - bnd_close (pd.Series): Cleaned closing prices for BND.
+            - spy_close (pd.Series): Cleaned closing prices for SPY.
+    """
     bnd = pd.read_csv('../data/raw/BND.csv', parse_dates=['Date'])
     spy = pd.read_csv('../data/raw/SPY.csv', parse_dates=['Date'])
 
@@ -26,7 +41,19 @@ def load_data():
 
     return bnd_close, spy_close
 
+
 def compute_expected_returns(tsla_forecasted_return, bnd_prices, spy_prices):
+    """
+    Compute expected annualized returns for TSLA (forecasted), BND, and SPY.
+
+    Args:
+        tsla_forecasted_return (float): Forecasted annualized return for TSLA.
+        bnd_prices (pd.Series): Historical closing prices of BND.
+        spy_prices (pd.Series): Historical closing prices of SPY.
+
+    Returns:
+        pd.Series: Expected annual returns for TSLA, BND, and SPY.
+    """
     # Annualize historical returns for BND and SPY
     bnd_returns = bnd_prices.pct_change().dropna()
     spy_returns = spy_prices.pct_change().dropna()
@@ -35,7 +62,6 @@ def compute_expected_returns(tsla_forecasted_return, bnd_prices, spy_prices):
     spy_annual_return = spy_returns.mean() * 252
 
     # Combine expected returns vector
-    # TSLA forecast return is already annualized or you may need to annualize it
     mu = pd.Series({
         'TSLA': tsla_forecasted_return,
         'BND': bnd_annual_return,
@@ -44,7 +70,19 @@ def compute_expected_returns(tsla_forecasted_return, bnd_prices, spy_prices):
 
     return mu
 
+
 def compute_covariance_matrix(tsla_returns, bnd_returns, spy_returns):
+    """
+    Compute the annualized covariance matrix of asset returns.
+
+    Args:
+        tsla_returns (pd.Series): Historical returns of TSLA.
+        bnd_returns (pd.Series): Historical returns of BND.
+        spy_returns (pd.Series): Historical returns of SPY.
+
+    Returns:
+        pd.DataFrame: Annualized covariance matrix of TSLA, BND, and SPY.
+    """
     # Combine returns into single DataFrame aligned by date
     df_returns = pd.concat([tsla_returns, bnd_returns, spy_returns], axis=1)
     df_returns.columns = ['TSLA', 'BND', 'SPY']
@@ -55,18 +93,42 @@ def compute_covariance_matrix(tsla_returns, bnd_returns, spy_returns):
 
     return cov_matrix
 
+
 def optimize_portfolio(mu, cov_matrix):
+    """
+    Optimize portfolio allocations for maximum Sharpe ratio and minimum volatility.
+
+    Args:
+        mu (pd.Series): Expected annualized returns of assets.
+        cov_matrix (pd.DataFrame): Covariance matrix of asset returns.
+
+    Returns:
+        tuple:
+            - weights_max_sharpe (dict): Optimized weights for maximum Sharpe ratio.
+            - weights_min_vol (dict): Optimized weights for minimum volatility.
+    """
     ef = EfficientFrontier(mu, cov_matrix)
     weights_max_sharpe = ef.max_sharpe()
 
     ef_min_vol = EfficientFrontier(mu, cov_matrix)
     weights_min_vol = ef_min_vol.min_volatility()
     
-    # Ensure both variables are returned
     return weights_max_sharpe, weights_min_vol
 
-def plot_efficient_frontier(mu, cov_matrix, weights_max_sharpe, weights_min_vol):
 
+def plot_efficient_frontier(mu, cov_matrix, weights_max_sharpe, weights_min_vol):
+    """
+    Plot the efficient frontier with TSLA, BND, and SPY.
+
+    Args:
+        mu (pd.Series): Expected annualized returns of assets.
+        cov_matrix (pd.DataFrame): Covariance matrix of asset returns.
+        weights_max_sharpe (dict): Portfolio weights optimized for maximum Sharpe ratio.
+        weights_min_vol (dict): Portfolio weights optimized for minimum volatility.
+
+    Displays:
+        Matplotlib plot of efficient frontier with assets.
+    """
     try:
         plt.style.use("seaborn-v0_8-deep")
     except OSError:
@@ -80,6 +142,20 @@ def plot_efficient_frontier(mu, cov_matrix, weights_max_sharpe, weights_min_vol)
 
 
 def summarize_portfolio(weights, mu, cov_matrix):
+    """
+    Print a summary of portfolio performance based on given weights.
+
+    Args:
+        weights (dict): Portfolio weights for assets.
+        mu (pd.Series): Expected annualized returns of assets.
+        cov_matrix (pd.DataFrame): Covariance matrix of asset returns.
+
+    Prints:
+        - Portfolio asset weights (percentage).
+        - Expected annual return.
+        - Annual volatility (risk).
+        - Sharpe ratio.
+    """
     ef = EfficientFrontier(mu, cov_matrix)
     ef.set_weights(weights)
     ret, vol, sharpe = ef.portfolio_performance()
