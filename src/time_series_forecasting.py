@@ -1,3 +1,5 @@
+# src/time_series_forecasting.py
+
 import pandas as pd
 import numpy as np
 import pmdarima as pm
@@ -5,7 +7,6 @@ from pmdarima import model_selection
 import matplotlib.pyplot as plt
 import os
 import sys
-import joblib  # <-- You need to add this import
 
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -60,29 +61,30 @@ def arima_forecasting(data_path: str):
     )
     print(f"\nBest ARIMA model parameters: {model.order}")
 
-    model_dir = 'models'
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
-        
-    model_path = os.path.join(model_dir, 'arima_model.joblib')
-    joblib.dump(model, model_path)
-    print(f"ARIMA model saved successfully to {model_path}")
-    # **END OF ADDED BLOCK**
+    # 4. Use the model to forecast over the test set period and future
+    n_periods_test = len(test)
+    n_periods_future = 252 # 1 year of trading days
     
-    # 4. Use the model to forecast over the test set period
-    n_periods = len(test)
-    forecast_arima = model.predict(n_periods=n_periods)
+    # Get test forecast and confidence intervals
+    test_forecast, test_conf_int = model.predict(n_periods=n_periods_test, return_conf_int=True)
     
-    # Create a DataFrame for the forecast
-    forecast_index = pd.date_range(start=test.index[0], periods=n_periods, freq='B')
-    forecast_df = pd.DataFrame(forecast_arima, index=forecast_index, columns=['Forecast'])
-
+    # Get future forecast and confidence intervals
+    future_forecast, future_conf_int = model.predict(n_periods=n_periods_future, return_conf_int=True)
+    
     # 5. Visualize the forecast against the test data
     plt.figure(figsize=(15, 6))
     plt.plot(train.index, train, label='Training Data')
     plt.plot(test.index, test, label='Actual Test Data', color='gray')
-    plt.plot(forecast_df.index, forecast_df['Forecast'], label='ARIMA Forecast', color='red')
-    plt.title("TSLA Stock Price: ARIMA Forecast vs. Actual")
+    plt.plot(test.index, test_forecast, label='ARIMA Test Forecast', color='red')
+    
+    # Plotting future forecast
+    future_index = pd.date_range(start=test.index[-1], periods=n_periods_future, freq='B')
+    plt.plot(future_index, future_forecast, label='ARIMA Future Forecast', color='green', linestyle='--')
+    
+    # Plot confidence intervals
+    plt.fill_between(future_index, future_conf_int[:, 0], future_conf_int[:, 1], color='green', alpha=0.1)
+    
+    plt.title("TSLA Stock Price: ARIMA Forecast with Confidence Intervals")
     plt.xlabel("Date")
     plt.ylabel("Adjusted Closing Price ($)")
     plt.legend()
@@ -100,6 +102,17 @@ def create_lstm_dataset(data, look_back=1):
         y.append(data[i + look_back, 0])
     return np.array(X), np.array(y)
 
+def forecast_lstm(model, last_sequence, n_periods):
+    """
+    Generates a recursive forecast for LSTM model.
+    """
+    forecast = []
+    current_sequence = last_sequence.copy()
+    for _ in range(n_periods):
+        next_pred = model.predict(current_sequence.reshape(1, current_sequence.shape[0], 1))
+        forecast.append(next_pred[0, 0])
+        current_sequence = np.append(current_sequence[1:], next_pred)
+    return np.array(forecast)
 
 def lstm_forecasting(data_path: str):
     """
@@ -124,16 +137,6 @@ def lstm_forecasting(data_path: str):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(tsla_prices)
 
-    # **ADD THIS BLOCK**
-    model_dir = 'models'
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
-        
-    scaler_path = os.path.join(model_dir, 'lstm_scaler.joblib')
-    joblib.dump(scaler, scaler_path)
-    print(f"LSTM scaler saved successfully to {scaler_path}")
-    # **END OF ADDED BLOCK**
-    
     # Divide the dataset into chronological training and testing sets
     train_size = int(len(scaled_data) * 0.8)
     train_scaled, test_scaled = scaled_data[:train_size], scaled_data[train_size:]
@@ -157,29 +160,29 @@ def lstm_forecasting(data_path: str):
     print("\nTraining LSTM model...")
     model.fit(X_train, y_train, epochs=1, batch_size=1, verbose=2)
 
-    # **ADD THIS BLOCK**
-    model_path = os.path.join(model_dir, 'lstm_model.keras')
-    model.save(model_path)
-    print(f"LSTM model saved successfully to {model_path}")
-    # **END OF ADDED BLOCK**
-    
-    # Make predictions
-    train_predict = model.predict(X_train)
+    # Make predictions on the test set
     test_predict = model.predict(X_test)
-
-    # Invert predictions to original scale
-    train_predict = scaler.inverse_transform(train_predict)
     test_predict = scaler.inverse_transform(test_predict)
     
+    # Generate future forecast
+    n_periods_future = 252
+    last_train_sequence = scaled_data[-(look_back + 1):-1]
+    future_forecast_scaled = forecast_lstm(model, last_train_sequence, n_periods_future)
+    future_forecast = scaler.inverse_transform(future_forecast_scaled.reshape(-1, 1))
+    
     # Generate the test forecast plot
-    test_predict_plot = np.empty_like(tsla_prices)
-    test_predict_plot[:, :] = np.nan
-    test_predict_plot[len(train_predict) + (look_back * 2) + 1:len(tsla_prices) - 1, :] = test_predict
-
     plt.figure(figsize=(15, 6))
     plt.plot(tsla_df.index, tsla_prices, label='Actual Prices')
-    plt.plot(tsla_df.index, test_predict_plot, label='LSTM Test Forecast', color='orange')
-    plt.title("TSLA Stock Price: LSTM Forecast vs. Actual")
+    
+    # Plot test forecast
+    test_index = tsla_df.index[train_size + look_back + 1: train_size + look_back + 1 + len(test_predict)]
+    plt.plot(test_index, test_predict, label='LSTM Test Forecast', color='orange')
+    
+    # Plot future forecast
+    future_index = pd.date_range(start=tsla_df.index[-1], periods=n_periods_future, freq='B')
+    plt.plot(future_index, future_forecast, label='LSTM Future Forecast', color='purple', linestyle='--')
+    
+    plt.title("TSLA Stock Price: LSTM Forecast")
     plt.xlabel("Date")
     plt.ylabel("Adjusted Closing Price ($)")
     plt.legend()
