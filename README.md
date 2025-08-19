@@ -69,6 +69,7 @@ The repository is structured to ensure **professional organization** and **full 
    .gitignore
    docker-compose.yml
    Dockerfile
+   app.py                  #streamlit dashboard
    README.md
    requirements.txt
 ```
