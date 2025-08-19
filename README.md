@@ -30,13 +30,6 @@ The analysis includes:
 * Risk metrics (Value at Risk, Sharpe Ratio)
 * Visualizations and key insights
 
-## Key Deliverables
-
-    Robust Data Pipeline: A src/data_cleaning.py script that systematically handles missing values and ensures data quality.
-
-    Core Financial Insights: Calculation and interpretation of Value at Risk (VaR) and the Sharpe Ratio.
-
-    Interactive Dashboard: A Streamlit dashboard that visualizes asset performance, risk, and correlation in real-time. This is the primary user interface for the project's findings.
 
 The repository is structured to ensure **professional organization** and **full reproducibility**.
 
@@ -45,30 +38,39 @@ The repository is structured to ensure **professional organization** and **full 
 ## **Repository Structure**
 
 ```plaintext
-    ├── .github/workflows/ci.yml        # GitHub Actions CI workflow
-    ├── data/
-    │   ├── processed/                  # Cleaned datasets for analysis
-    │   │   ├── bnd_clean.csv
-    │   │   ├── spy_clean.csv
-    │   │   └── tsla_clean.csv
-    │   └── raw/                        # Original downloaded datasets
-    │       ├── BND.csv
-    │       ├── SPY.csv
-    │       └── TSLA.csv
-    ├── notebooks/
-    │   └── 01_eda.ipynb                 # Exploratory data analysis
-    ├── reports/
-    │   ├──figures/                       #figures of plots
-    │   ├──EDA_RESULTS_AND_ANALYSIS.MD    #Text-based summary of findings
-    │   └── normalized_price_analysis.txt # Text-based summary of normalized price analysis
-    ├── src/
-    │   ├── data_cleaning.py             # Data cleaning pipeline
-    │   └── data_loader.py               # Data loading utilities
-    ├── .gitignore
-    ├── requirements.txt                 # Python dependencies
-    ├── app.py                           # dashboard for non- technical users
-    ├── README.md                        # Project documentation
-    └── .venv/                           # Virtual environment (local use only)
+      .github/
+   └── workflows/                # CI workflow files
+   data/
+   ├── processed/                # Cleaned datasets
+   └── raw/                      # Raw downloaded datasets
+   models/
+   ├── arima_model.pkl           # Serialized ARIMA model
+   ├── lstm_model.h5             # LSTM model weights
+   └── lstm_model.pkl            # Serialized LSTM model
+   notebooks/
+   ├── 01_eda.ipynb              # Exploratory Data Analysis
+   ├── 02_forecasting_models.ipynb  # Forecasting using ARIMA & LSTM
+   └── 03_Portfolio_Optimization_and_Backtesting.ipynb  # Portfolio tasks
+   reports/
+   ├── figures/                  # Generated figures and plots
+   ├── EDA_RESULTS_AND_ANALYSIS.md  # Summary of EDA findings
+   └── normalized_price_analysis.txt  # Price normalization analysis
+   src/
+   ├── arima_model.py            # ARIMA forecasting logic
+   ├── data_cleaning.py          # Data cleaning pipeline
+   ├── data_loader.py            # Data fetching utilities
+   ├── data_prep.py              # Data preprocessing helpers
+   ├── lstm_model.py             # LSTM forecasting model implementation
+   └── portfolio_optimization.py # Portfolio optimization and backtesting logic
+   .venv/                        # Local Python virtual environment
+   test/
+   ├── Unit Tests for data_cleaning.py              
+   └── Unit Tests for portfolio_optimization.py
+   .gitignore
+   docker-compose.yml
+   Dockerfile
+   README.md
+   requirements.txt
 ```
 
 ---
@@ -126,7 +128,11 @@ streamlit run app.py
    * Analyze volatility and trends
    * Perform statistical tests (ADF)
 
+3. **Unit test**
+   Open `test` to:
 
+   * Get unit test scripts
+   
 ### How to use in Docker:
 
 1. **Build the Docker image** (run this in your project root, where the Dockerfile is):
